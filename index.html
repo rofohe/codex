@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CODEX — Code Repository</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d0f14;
+  --surface:  #151820;
+  --card:     #1c2030;
+  --border:   #262d3f;
+  --border2:  #2f3850;
+  --text:     #c8d0e8;
+  --muted:    #5a6480;
+  --py:       #4b9eff;
+  --r:        #6dd6a0;
+  --sql:      #ffb347;
+  --xl:       #69d45d;
+  --danger:   #ff5c5c;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, #1a2040 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, #1a1f2e 39px, #1a1f2e 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, #1a1f2e 39px, #1a1f2e 40px);
+  background-attachment: fixed;
+}
+
+/* ── Header ─────────────────────────────────── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 22px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(13,15,20,.8);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo-mark {
+  width: 36px; height: 36px;
+  border: 2px solid var(--py);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--py);
+  letter-spacing: -1px;
+}
+header h1 {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: #fff;
+}
+header h1 span { color: var(--py); }
+.header-sub { color: var(--muted); font-size: 11px; margin-left: auto; }
+
+/* ── Layout ─────────────────────────────────── */
+main { max-width: 1280px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* ── Section titles ─────────────────────────── */
+.section-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Add Form ────────────────────────────────── */
+.add-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 44px;
+}
+
+/* Source buttons */
+.source-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.src-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  background: var(--card);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.src-btn .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .5;
+  transition: opacity .18s;
+}
+.src-btn:hover { border-color: var(--border2); color: var(--text); }
+.src-btn[data-lang="Python"].active  { border-color: var(--py);  color: var(--py);  background: rgba(75,158,255,.08); }
+.src-btn[data-lang="R"].active       { border-color: var(--r);   color: var(--r);   background: rgba(109,214,160,.08); }
+.src-btn[data-lang="SQL"].active     { border-color: var(--sql); color: var(--sql); background: rgba(255,179,71,.08); }
+.src-btn[data-lang="Excel"].active   { border-color: var(--xl);  color: var(--xl);  background: rgba(105,212,93,.08); }
+.src-btn.active .dot { opacity: 1; }
+
+/* Form grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.form-group input, .form-group textarea, .form-group select {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 10px 14px;
+  transition: border-color .15s;
+  outline: none;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+  border-color: var(--py);
+}
+.form-group textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+
+/* Importance stars */
+.stars-row { display: flex; gap: 6px; }
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--border2);
+  transition: color .12s, transform .12s;
+  padding: 2px;
+}
+.star-btn.lit { color: #f6c90e; }
+.star-btn:hover { transform: scale(1.2); }
+
+/* Submit */
+.form-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+.btn-primary {
+  background: var(--py);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  letter-spacing: .04em;
+}
+.btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text); }
+
+/* toast */
+.toast {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s ease;
+  z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: var(--r); }
+.toast.error   { border-color: var(--danger); }
+
+/* ── Library Section ─────────────────────────── */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 24px; }
+.tab {
+  padding: 9px 20px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .05em;
+  transition: all .15s;
+  position: relative;
+}
+.tab:hover { color: var(--text); }
+.tab[data-lang="Python"].active { background: var(--surface); border-color: var(--border); color: var(--py); }
+.tab[data-lang="R"].active      { background: var(--surface); border-color: var(--border); color: var(--r); }
+.tab[data-lang="SQL"].active    { background: var(--surface); border-color: var(--border); color: var(--sql); }
+.tab[data-lang="Excel"].active  { background: var(--surface); border-color: var(--border); color: var(--xl); }
+.tab[data-lang="All"].active    { background: var(--surface); border-color: var(--border); color: var(--text); }
+.tab .count {
+  background: var(--border2);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+/* Table */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0 12px 12px 12px;
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  background: var(--card);
+  padding: 13px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th:first-child { padding-left: 24px; }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.02); }
+tbody td {
+  padding: 13px 16px;
+  font-size: 12px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+tbody td:first-child { padding-left: 24px; }
+
+/* lang badge */
+.lang-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.lang-badge.Python { color: var(--py);  border-color: var(--py);  background: rgba(75,158,255,.1); }
+.lang-badge.R      { color: var(--r);   border-color: var(--r);   background: rgba(109,214,160,.1); }
+.lang-badge.SQL    { color: var(--sql); border-color: var(--sql); background: rgba(255,179,71,.1); }
+.lang-badge.Excel  { color: var(--xl);  border-color: var(--xl);  background: rgba(105,212,93,.1); }
+
+/* stars display */
+.stars-display { color: #f6c90e; font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
+.stars-display .empty { color: var(--border2); }
+
+/* code cell */
+.code-preview {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  max-width: 340px;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: border-color .15s;
+  line-height: 1.6;
+}
+.code-preview:hover { border-color: var(--border2); }
+
+/* actions */
+.row-actions { display: flex; gap: 6px; white-space: nowrap; }
+.act-btn {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .13s;
+}
+.act-btn:hover { color: var(--text); border-color: var(--text); }
+.act-btn.del:hover { color: var(--danger); border-color: var(--danger); }
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--muted);
+}
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+/* ── Modal ───────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  animation: slideUp .22s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-title {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.modal-close {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color .13s;
+}
+.modal-close:hover { color: var(--text); }
+.modal .form-footer { margin-top: 24px; }
+
+/* code expand overlay */
+.code-modal-body {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre;
+  overflow-x: auto;
+  max-height: 50vh;
+  overflow-y: auto;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── responsive ─────────────────────────────── */
+@media(max-width: 700px) {
+  main { padding: 24px 16px 60px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .add-panel { padding: 20px 18px; }
+  header { padding: 16px 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">cx</div>
+  <h1>CODE<span>X</span></h1>
+  <span class="header-sub">// centralized code intelligence</span>
+</header>
+
+<main>
+
+<!-- ── ADD SNIPPET ─────────────────────────── -->
+<div class="section-label">New Snippet</div>
+<div class="add-panel" id="addPanel">
+
+  <div class="source-row" id="srcBtns">
+    <button class="src-btn active" data-lang="Python"><span class="dot"></span>Python</button>
+    <button class="src-btn" data-lang="R"><span class="dot"></span>R</button>
+    <button class="src-btn" data-lang="SQL"><span class="dot"></span>SQL</button>
+    <button class="src-btn" data-lang="Excel"><span class="dot"></span>Excel</button>
+  </div>
+
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Name</label>
+      <input id="fName" type="text" placeholder="e.g. Rolling 7-day average">
+    </div>
+    <div class="form-group">
+      <label>Importance</label>
+      <div class="stars-row" id="fStars">
+        <button class="star-btn lit" data-v="1">★</button>
+        <button class="star-btn lit" data-v="2">★</button>
+        <button class="star-btn lit" data-v="3">★</button>
+        <button class="star-btn" data-v="4">★</button>
+        <button class="star-btn" data-v="5">★</button>
+      </div>
+    </div>
+    <div class="form-group full">
+      <label>Description</label>
+      <input id="fDesc" type="text" placeholder="What does this snippet do?">
+    </div>
+    <div class="form-group full">
+      <label>Code / Formula</label>
+      <textarea id="fCode" placeholder="Paste your code or formula here…"></textarea>
+    </div>
+  </div>
+
+  <div class="form-footer">
+    <button class="btn-ghost" id="clearBtn">Clear</button>
+    <button class="btn-primary" id="submitBtn">＋ Add to Library</button>
+  </div>
+</div>
+
+<!-- ── LIBRARY ─────────────────────────────── -->
+<div class="section-label">Library</div>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab active" data-lang="All">All <span class="count" id="cnt-All">0</span></button>
+  <button class="tab" data-lang="Python">Python <span class="count" id="cnt-Python">0</span></button>
+  <button class="tab" data-lang="R">R <span class="count" id="cnt-R">0</span></button>
+  <button class="tab" data-lang="SQL">SQL <span class="count" id="cnt-SQL">0</span></button>
+  <button class="tab" data-lang="Excel">Excel <span class="count" id="cnt-Excel">0</span></button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Source</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Code Preview</th>
+        <th>Importance</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="snippetBody"></tbody>
+  </table>
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="icon">📂</div>
+    <p>No snippets yet. Add one above.</p>
+  </div>
+</div>
+</main>
+
+<!-- ── VIEW CODE MODAL ─────────────────────── -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-header">
+      <div class="modal-title" id="viewTitle">Code</div>
+      <button class="modal-close" onclick="closeModal('viewModal')">✕</button>
+    </div>
+    <pre class="code-modal-body" id="viewCode"></pre>
+  </div>
+</div>
+
+<!-- ── EDIT MODAL ─────────────────────────── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Snippet</div>
+      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <input type="hidden" id="eId">
+
+    <div style="margin-bottom:16px">
+      <div class="section-label" style="font-size:10px;margin-bottom:10px">Source</div>
+      <div class="source-row" id="eSrcBtns">
+        <button class="src-btn" data-lang="Python"><span class="dot"></span>Python</button>
+        <button class="src-btn" data-lang="R"><span class="dot"></span>R</button>
+        <button class="src-btn" data-lang="SQL"><span class="dot"></span>SQL</button>
+        <button class="src-btn" data-lang="Excel"><span class="dot"></span>Excel</button>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Name</label>
+        <input id="eName" type="text">
+      </div>
+      <div class="form-group">
+        <label>Importance</label>
+        <div class="stars-row" id="eStars">
+          <button class="star-btn" data-v="1">★</button>
+          <button class="star-btn" data-v="2">★</button>
+          <button class="star-btn" data-v="3">★</button>
+          <button class="star-btn" data-v="4">★</button>
+          <button class="star-btn" data-v="5">★</button>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Description</label>
+        <input id="eDesc" type="text">
+      </div>
+      <div class="form-group full">
+        <label>Code / Formula</label>
+        <textarea id="eCode" style="min-height:160px"></textarea>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn-primary" id="saveEditBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────── -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+/* ── State ─────────────────────────────────── */
+let snippets = [];
+let activeTab = 'All';
+let addImportance = 3;
+let editImportance = 3;
+let addSource = 'Python';
+
+/* ── API helpers ───────────────────────────── */
+async function api(method, path, body) {
+  const r = await fetch(path, {
+    method,
+    headers: {'Content-Type':'application/json'},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) {
+    const e = await r.json();
+    throw new Error(e.error || 'Server error');
+  }
+  return r.status === 204 ? null : r.json();
+}
+
+/* ── Toast ─────────────────────────────────── */
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ── Stars widget ──────────────────────────── */
+function initStars(containerId, getter, setter) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setter(+btn.dataset.v);
+      renderStars(containerId, getter());
+    });
+  });
+}
+function renderStars(containerId, val) {
+  document.getElementById(containerId).querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('lit', +b.dataset.v <= val);
+  });
+}
+
+/* ── Source buttons ────────────────────────── */
+function initSrcBtns(containerId, onSelect) {
+  document.getElementById(containerId).querySelectorAll('.src-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(containerId).querySelectorAll('.src-btn')
+        .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onSelect(btn.dataset.lang);
+    });
+  });
+}
+function setSrcBtn(containerId, lang) {
+  document.getElementById(containerId).querySelectorAll('.src-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+/* ── Load & render ─────────────────────────── */
+async function loadSnippets() {
+  const src = activeTab === 'All' ? '' : activeTab;
+  const all  = await api('GET', '/api/snippets');
+  snippets = activeTab === 'All' ? all : all.filter(s => s.source === activeTab);
+
+  // update counts
+  const langs = ['All','Python','R','SQL','Excel'];
+  langs.forEach(l => {
+    const cnt = l === 'All' ? all.length : all.filter(s => s.source === l).length;
+    document.getElementById(`cnt-${l}`).textContent = cnt;
+  });
+
+  renderTable();
+}
+
+function starsHTML(n) {
+  return [...Array(5)].map((_,i) =>
+    `<span class="${i < n ? '' : 'empty'}">★</span>`
+  ).join('');
+}
+
+function codeLines(code, max=4) {
+  const lines = code.split('\n').slice(0, max);
+  return lines.join('\n') + (code.split('\n').length > max ? '\n…' : '');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('snippetBody');
+  const empty = document.getElementById('emptyState');
+
+  if (!snippets.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = snippets.map((s, i) => `
+    <tr>
+      <td style="color:var(--muted);font-size:11px">#${i+1}</td>
+      <td><span class="lang-badge ${s.source}">${s.source}</span></td>
+      <td style="font-weight:600;color:#e8ecf8;min-width:140px">${esc(s.name)}</td>
+      <td style="color:var(--muted);max-width:200px;font-size:11px">${esc(s.description||'—')}</td>
+      <td>
+        <div class="code-preview" title="Click to expand" onclick="viewCode(${s.id})">${esc(codeLines(s.code))}</div>
+      </td>
+      <td><div class="stars-display">${starsHTML(s.importance)}</div></td>
+      <td>
+        <div class="row-actions">
+          <button class="act-btn" onclick="openEdit(${s.id})">Edit</button>
+          <button class="act-btn del" onclick="deleteSnippet(${s.id})">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Tabs ──────────────────────────────────── */
+document.getElementById('tabBar').querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.lang;
+    loadSnippets();
+  });
+});
+
+/* ── Add form ──────────────────────────────── */
+initStars('fStars', () => addImportance, v => addImportance = v);
+renderStars('fStars', addImportance);
+initSrcBtns('srcBtns', lang => addSource = lang);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('fName').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fCode').value = '';
+  addImportance = 3;
+  renderStars('fStars', 3);
+});
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const name = document.getElementById('fName').value.trim();
+  const code = document.getElementById('fCode').value.trim();
+  if (!name || !code) { toast('Name and Code are required', 'error'); return; }
+  try {
+    await api('POST', '/api/snippets', {
+      source: addSource,
+      name, code,
+      description: document.getElementById('fDesc').value.trim(),
+      importance: addImportance,
+    });
+    toast('Snippet added ✓');
+    document.getElementById('fName').value = '';
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fCode').value = '';
+    addImportance = 3;
+    renderStars('fStars', 3);
+    // switch tab to match added source
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const matchTab = document.querySelector(`.tab[data-lang="${addSource}"]`);
+    if (matchTab) { matchTab.classList.add('active'); activeTab = addSource; }
+    loadSnippets();
+  } catch(e) { toast(e.message, 'error'); }
+});
+
+/* ── View code modal ───────────────────────── */
+function viewCode(id) {
+  const s = snippets.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('viewTitle').textContent = `${s.source} — ${s.name}`;
+  document.getElementById('viewCode').textContent = s.code;
+  document.getElementById('viewModal').classList.add('open');
+}
+
+/* ── Edit modal ────────────────────────────── */
+let editSource = 'Python';
+initStars('eStars', () => editImportance, v => editImportance = v);
+initSrcBtns('eSrcBtns', lang => editSource = lang);
+
+function openEdit(id) {
+  const s = snippets.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('eId').value = s.id;
+  document.getElementById('eName').value = s.name;
+  document.getElementById('eDesc').value = s.description || '';
+  document.getElementById('eCode').value = s.code;
+  editSource = s.source;
+  editImportance = s.importance;
+  setSrcBtn('eSrcBtns', editSource);
+  renderStars('eStars', editImportance);
+  document.getElementById('editModal').classList.add('open');
+}
+
+document.getElementById('saveEditBtn').addEventListener('click', async () => {
+  const id = +document.getElementById('eId').value;
+  const name = document.getElementById('eName').value.trim();
+  const code = document.getElementById('eCode').value.trim();
+  if (!name || !code) { toast('Name and Code are required', 'error'); return; }
+  try {
+    await api('PUT', `/api/snippets/${id}`, {
+      source: editSource, name, code,
+      description: document.getElementById('eDesc').value.trim(),
+      importance: editImportance,
+    });
+    toast('Saved ✓');
+    closeModal('editModal');
+    loadSnippets();
+  } catch(e) { toast(e.message, 'error'); }
+});
+
+/* ── Delete ────────────────────────────────── */
+async function deleteSnippet(id) {
+  if (!confirm('Delete this snippet?')) return;
+  try {
+    await api('DELETE', `/api/snippets/${id}`);
+    toast('Deleted');
+    loadSnippets();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+/* ── Modals ────────────────────────────────── */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+});
+
+/* ── Init ──────────────────────────────────── */
+loadSnippets();
+</script>
+</body>
+</html>
